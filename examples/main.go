@@ -82,3 +82,26 @@ func main() {
 		panic("the final result is wrong!!!")
 	}
 }
+
+func example1() {
+	// 创建一个协程池，最大容量为10
+	pool, _ := ants.NewPool(10)
+
+	// 创建一个等待组，用于等待所有任务完成
+	var wg sync.WaitGroup
+
+	// 提交10个任务到协程池中执行
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		pool.Submit(func() {
+			fmt.Println("Hello, ants!")
+			wg.Done()
+		})
+	}
+
+	// 等待所有任务完成
+	wg.Wait()
+
+	// 关闭协程池
+	pool.Release()
+}

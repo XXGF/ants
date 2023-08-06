@@ -73,12 +73,19 @@ var (
 		// Use blocking channel if GOMAXPROCS=1.
 		// This switches context from sender to receiver immediately,
 		// which results in higher performance (under go1.5 at least).
+		// 如果CPU是单核，则使用阻塞channel，即容量为0的channel
 		if runtime.GOMAXPROCS(0) == 1 {
 			return 0
 		}
 
+		// 注意：
+		// runtime.GOMAXPROCS的入参n，是一个整数类型的参数，表示要设置的最大CPU数。
+		// - 如果n的值小于1，则不会改变GOMAXPROCS的值。
+		// - 如果n的值大于1，则会将GOMAXPROCS的值设置为n，并返回之前的GOMAXPROCS值。
+
 		// Use non-blocking workerChan if GOMAXPROCS>1,
 		// since otherwise the sender might be dragged down if the receiver is CPU-bound.
+		// 否则，使用容量为 1 的channel，虽然不阻塞，但是也只能容纳一个task
 		return 1
 	}()
 
